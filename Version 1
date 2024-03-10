@@ -1,0 +1,120 @@
+.data  # data segment (Where we are declaring our variables)
+     
+inputMessage1:
+    .string "Enter first input value (x): " # Prompt for first input value (x)
+    
+
+inputMessage2:
+    .string "\nEnter second input value (y): " # Prompt for second input value (y)
+    
+
+greaterThanMessage:
+    .string "\nx > y" # Message that is displayed if user's x is greater than the user's y
+    
+    
+lessThanOrEqualToMessage:
+    .string "\nx <= y" # Message that is displayed if user's x is less than or equal to user's y
+        
+
+testMessage:
+    .string " <= " # Outputting newline
+    
+    
+.bss # Area where we are declaring uninitialized variables that the user will eventually initialize
+
+	.lcomm firstInputX, 8
+	.lcomm secondInputY, 8
+
+
+	
+.text  # Code segment (where all of our instructions go)
+
+.global main
+
+main:
+
+
+
+    ### Prompting and Reading for X ###
+
+
+    # Prompting user for First Input (x)
+
+    movq $4, %rax # Calls sys_write    
+	movq $1, %rbx # Tells sys_write to write output to standard output ($1 = stdout)
+	movq $inputMessage1, %rcx # Puts inputMessage1 in the argument of sys_write for what to output
+	movq $29, %rdx # Length of string message to be written to standard output
+	
+	int $0x80 # System interrupt
+	
+	# Reading input from user for First Input (x)
+	
+	movq $3, %rax # Calls sys_read
+    movq $0, %rbx # Tells sys_read to read input to stdin
+    movq $firstInputX, %rcx # The user's First Input  
+    movq $0x8, %rdx # Length of bytes we are allowing for the user to enter
+    
+    int $0x80 # System interrupt
+    
+    
+    
+    ### Prompting and Reading for Y ###
+
+    
+    # Prompting user for Second Input (y)
+
+    movq $4, %rax # Calls sys_write    
+	movq $1, %rbx # Tells sys_write to write output to standard output ($1 = stdout)
+	movq $inputMessage2, %rcx # Puts inputMessage2 in the argument of sys_write for what to output
+	movq $31, %rdx # Length of string message to be written to standard output
+	
+	int $0x80 # System interrupt
+	
+	
+	
+	
+	# Reading input from user for Second Input (y)
+	
+	movq $3, %rax # Calls sys_read
+    movq $0, %rbx # Tells sys_read to read input to stdin
+    movq $secondInputY, %rcx # The user's First Input  
+    movq $0x8, %rdx # Length of bytes we are allowing for the user to enter
+    
+    int $0x80 # System interrupt
+    
+    
+    # Moving user's inputs into their own registers
+    
+    movq firstInputX, %r8
+    
+    movq secondInputY, %r9
+    
+
+    
+    
+    ### Comparing values of X and Y ###
+
+    cmpq %r9, %r8 # Telling the assembler to compare x (%r8) and y (%r9)
+    
+    jle .L1
+    
+    
+        movq $4, %rax # Calls sys_write    
+    	movq $1, %rbx # Tells sys_write to write output to standard output ($1 = stdout)
+    	movq $greaterThanMessage, %rcx # Puts lessThanOrEqualToMessage in the argument of sys_write for what to output
+    	movq $6, %rdx # Length of string message to be written to standard output
+    	int $0x80 # System interrupt
+    	ret
+    
+    
+    
+    .L1:
+        movq $4, %rax # Calls sys_write    
+    	movq $1, %rbx # Tells sys_write to write output to standard output ($1 = stdout)
+    	movq $lessThanOrEqualToMessage, %rcx # Puts lessThanOrEqualToMessage in the argument of sys_write for what to output
+    	movq $7, %rdx # Length of string message to be written to standard output
+    	int $0x80 # System interrupt
+    	ret
+
+    
+    
