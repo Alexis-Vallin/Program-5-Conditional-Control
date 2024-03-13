@@ -6,25 +6,24 @@ inputMessage1:
 
 inputMessage2:
     .string "\nEnter second input value (y): " # Prompt for second input value (y)
+
+        
+lessThanOrEqualToMessage:
+    .string " <= " # 4
     
 
 greaterThanMessage:
-    .string "\nx > y" # Message that is displayed if user's x is greater than the user's y
+    .string " > " # 3
     
     
-lessThanOrEqualToMessage:
-    .string "\nx <= y" # Message that is displayed if user's x is less than or equal to user's y
-        
-
-testMessage:
-    .string " <= " # Outputting newline
+newLine:
+    .string "\n" # Outputting newline
     
     
 .bss # Area where we are declaring uninitialized variables that the user will eventually initialize
 
 	.lcomm firstInputX, 8
 	.lcomm secondInputY, 8
-
 
 	
 .text  # Code segment (where all of our instructions go)
@@ -35,7 +34,7 @@ main:
 
 
 
-    ### Prompting and Reading for X ###
+        ##### Prompting and Reading for X #####
 
 
     # Prompting user for First Input (x)
@@ -58,7 +57,8 @@ main:
     
     
     
-    ### Prompting and Reading for Y ###
+    
+        ##### Prompting and Reading for Y #####
 
     
     # Prompting user for Second Input (y)
@@ -70,8 +70,7 @@ main:
 	
 	int $0x80 # System interrupt
 	
-	
-	
+
 	
 	# Reading input from user for Second Input (y)
 	
@@ -83,38 +82,110 @@ main:
     int $0x80 # System interrupt
     
     
+    
+        ##### Comparing values of X and Y #####
+
+    
     # Moving user's inputs into their own registers
     
     movq firstInputX, %r8
     
     movq secondInputY, %r9
     
-
     
+    # Comparing both values
     
-    ### Comparing values of X and Y ###
-
     cmpq %r9, %r8 # Telling the assembler to compare x (%r8) and y (%r9)
+    
+    
+    
+    
+    
+    # Inputting what is contained inside of %r8 and %r9 back into firstInputX and secondInputY
+    
+    # (We want to use the immediate value instead of accessing the register for x and y)
+    
+    movq %r8, firstInputX
+    
+    movq %r9, secondInputY
+    
+    
     
     jle .L1
     
+        
+        # x is greater than y, so print out "firstInputX > firstInputY"
+        
     
         movq $4, %rax # Calls sys_write    
     	movq $1, %rbx # Tells sys_write to write output to standard output ($1 = stdout)
-    	movq $greaterThanMessage, %rcx # Puts lessThanOrEqualToMessage in the argument of sys_write for what to output
-    	movq $6, %rdx # Length of string message to be written to standard output
+    	movq $newLine, %rcx # Puts newLine in the argument of sys_write for what to output
+    	movq $1, %rdx # Length of string message to be written to standard output
+    	int $0x80 # System interrupt
+        
+        
+        movq $4, %rax # Calls sys_write    
+    	movq $1, %rbx # Tells sys_write to write output to standard output ($1 = stdout)
+    	movq $firstInputX, %rcx # Puts greaterThan in the argument of sys_write for what to output
+    	movq $1, %rdx # Length of string message to be written to standard output
+    	int $0x80 # System interrupt
+    	
+    	
+    	
+    	
+        movq $4, %rax # Calls sys_write    
+    	movq $1, %rbx # Tells sys_write to write output to standard output ($1 = stdout)
+    	movq $greaterThanMessage, %rcx # Puts greaterThan in the argument of sys_write for what to output
+    	movq $3, %rdx # Length of string message to be written to standard output
+    	int $0x80 # System interrupt
+    	
+    
+    
+    
+        movq $4, %rax # Calls sys_write    
+    	movq $1, %rbx # Tells sys_write to write output to standard output ($1 = stdout)
+    	movq $secondInputY, %rcx # Puts greaterThan in the argument of sys_write for what to output
+    	movq $1, %rdx # Length of string message to be written to standard output
     	int $0x80 # System interrupt
     	ret
     
     
     
+    
+        # x is less than or equal to y, so print out "firstInputX <= firstInputY"
+
     .L1:
+    
         movq $4, %rax # Calls sys_write    
     	movq $1, %rbx # Tells sys_write to write output to standard output ($1 = stdout)
-    	movq $lessThanOrEqualToMessage, %rcx # Puts lessThanOrEqualToMessage in the argument of sys_write for what to output
-    	movq $7, %rdx # Length of string message to be written to standard output
+    	movq $newLine, %rcx # Puts newLine in the argument of sys_write for what to output
+    	movq $1, %rdx # Length of string message to be written to standard output
+    	int $0x80 # System interrupt
+        
+        
+        movq $4, %rax # Calls sys_write    
+    	movq $1, %rbx # Tells sys_write to write output to standard output ($1 = stdout)
+    	movq $firstInputX, %rcx # Puts greaterThan in the argument of sys_write for what to output
+    	movq $1, %rdx # Length of string message to be written to standard output
+    	int $0x80 # System interrupt
+    	
+    	
+    	
+        movq $4, %rax # Calls sys_write    
+    	movq $1, %rbx # Tells sys_write to write output to standard output ($1 = stdout)
+    	movq $lessThanOrEqualToMessage, %rcx # Puts greaterThan in the argument of sys_write for what to output
+    	movq $4, %rdx # Length of string message to be written to standard output
+    	int $0x80 # System interrupt
+    	
+    
+    
+        movq $4, %rax # Calls sys_write    
+    	movq $1, %rbx # Tells sys_write to write output to standard output ($1 = stdout)
+    	movq $secondInputY, %rcx # Puts greaterThan in the argument of sys_write for what to output
+    	movq $1, %rdx # Length of string message to be written to standard output
     	int $0x80 # System interrupt
     	ret
+    
 
     
     
